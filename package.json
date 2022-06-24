@@ -1,0 +1,23 @@
+{
+  "name": "nqtcoin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/nqt-coin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thanhqng1510/NqtCoin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thanhqng1510/NqtCoin/issues"
+  },
+  "homepage": "https://github.com/thanhqng1510/NqtCoin#readme",
+  "dependencies": {
+    "debug": "^4.1.1",
+    "elliptic": "^6.5.4"
+  }
+}
