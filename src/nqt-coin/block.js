@@ -1,18 +1,29 @@
 const crypto = require('crypto');
 
 class Block {
-    #timestamp = null
-    #transactions = null
-    #nonce = null
-    #hash = null
-    #previousHash = null
+    #index = null;
+    #timestamp = null;
+    #transactions = null;
+    #nonce = null;
+    #previousHash = null;
+    #hash = null;
 
-    constructor(timestamp, transactions, previousHash) {
-        this.#timestamp = timestamp;
+    constructor(index, transactions, previousHash) {
+        if (index === null || index === undefined || index < 0)
+            throw new Error('Invalid index in this block');
+        
+        if (!transactions || transactions.length === 0) 
+            throw new Error('Invalid transactions in this block');
+
+        if (index !== 0 && !previousHash) 
+            throw new Error('Invalid previous hash in this block');
+
+        this.#index = index;
+        this.#timestamp = Date.now();
         this.#transactions = transactions;
         this.#nonce = 0;
-        this.#hash = this.calculateHash();
         this.#previousHash = previousHash;
+        this.#hash = this.calculateHash();
     }
 
     getHash() {
@@ -23,10 +34,18 @@ class Block {
         return this.#previousHash;
     }
 
-    getBalanceInBlockOfAddress(address) {
+    getIndex() {
+        return this.#index;
+    }
+
+    getTimestamp() {
+        return this.#timestamp;
+    }
+
+    getBalanceOfAddress(address) {
         let balance = 0;
 
-        for (const trans of this.#transactions ?? []) {
+        for (const trans of this.#transactions) {
             if (trans.getSrcAddress() === address)
                 balance -= trans.getAmount();
 
@@ -38,13 +57,13 @@ class Block {
     }
 
     dump() {
-        return (this.#transactions ?? []).reduce((prev, v) => {
-            return prev + (v.dump() ?? '');
-        }, '');
+        return `Block ${this.#index} - Hash ${this.getHash()}\n${(this.#transactions).reduce((prev, v) => {
+            return prev + v.dump();
+        }, '')}`;
     }
 
     calculateHash() {
-        return crypto.createHash('sha256').update(this.#previousHash + this.#timestamp + JSON.stringify(this.#transactions ?? []) + this.#nonce).digest('hex');
+        return crypto.createHash('sha256').update(this.#index + this.#previousHash + this.#timestamp + JSON.stringify(this.#transactions) + this.#nonce).digest('hex');
     }
 
     mineBlock(difficulty) {
@@ -55,7 +74,7 @@ class Block {
     }
 
     isValid() {
-        return this.#transactions.every((tx) => tx.isValid());
+        return this.#transactions.every((tx) => tx.isValid()) && this.#hash === this.calculateHash();
     }
 }
 

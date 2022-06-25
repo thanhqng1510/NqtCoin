@@ -11,6 +11,12 @@ class Transaction {
     #signature = null;
 
     constructor(srcAddress, destAddress, amount) {
+        if (!srcAddress || !destAddress)
+            throw new Error('No address in this transaction');
+        
+        if (amount === null || amount === undefined || amount <= 0) 
+            throw new Error('Invalid amount in this transaction');
+
         this.#srcAddress = srcAddress;
         this.#destAddress = destAddress;
         this.#amount = amount;
@@ -29,8 +35,12 @@ class Transaction {
         return this.#amount;
     }
 
+    getTimestamp() {
+        return this.#timestamp;
+    }
+
     dump() {
-        return `Transaction\nFrom: ${this.#srcAddress}\nTo: ${this.#destAddress}\nAmount: ${this.#amount}\n\n`;
+        return `Transaction\nFrom: ${this.#srcAddress}\nTo: ${this.#destAddress}\nAmount: ${this.#amount}\nTimestamp: ${Date(this.#timestamp).toString()}\n`;
     }
 
     calculateHash() {
@@ -38,9 +48,8 @@ class Transaction {
     }
 
     signTransaction(keyPair) {
-        if (keyPair.getPublic('hex') !== this.#srcAddress) {
+        if (keyPair.getPublic('hex') !== this.#srcAddress)
             throw new Error('Public key do not match');
-        }
 
         const hashTx = this.calculateHash();
         const sig = keyPair.sign(hashTx, 'base64');
@@ -49,11 +58,8 @@ class Transaction {
     }
 
     isValid() {
-        if (this.#srcAddress === null) return true;
-
-        if (!this.#signature || this.#signature.length === 0) {
+        if (!this.#signature || this.#signature.length === 0)
             throw new Error('No signature in this transaction');
-        }
 
         const publicKey = ec.keyFromPublic(this.#srcAddress, 'hex');
         return publicKey.verify(this.calculateHash(), this.#signature);

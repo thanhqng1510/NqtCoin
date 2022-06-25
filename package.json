@@ -18,6 +18,7 @@
   "homepage": "https://github.com/thanhqng1510/NqtCoin#readme",
   "dependencies": {
     "debug": "^4.1.1",
-    "elliptic": "^6.5.4"
+    "elliptic": "^6.5.4",
+    "ws": "^8.8.0"
   }
 }
